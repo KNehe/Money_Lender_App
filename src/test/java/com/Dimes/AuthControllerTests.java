@@ -9,9 +9,7 @@ import com.Dimes.Services.AuthService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.autoconfigure.security.servlet.ManagementWebSecurityAutoConfiguration;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
+
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -45,7 +43,7 @@ public class AuthControllerTests extends JsonManager {
     @MockBean
     private AuthService authService;
 
-    private Lender lender = new Lender("charles company",1000.0,2.3,"nehe@gmail.com","Nehe","12345678","Admin");
+    private Lender lender = new Lender(1,"charles company",1000.0,2.3,"nehe@gmail.com","Nehe","12345678","Admin");
 
     @Test
     void saveLenderTest() throws  Exception

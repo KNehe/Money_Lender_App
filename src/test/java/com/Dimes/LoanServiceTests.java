@@ -2,6 +2,7 @@
 package com.Dimes;
 
 
+import com.Dimes.Models.Lender;
 import com.Dimes.Models.Loan;
 import com.Dimes.Repositories.LoanRepository;
 import com.Dimes.Services.LoanService;
@@ -22,6 +23,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -46,7 +48,8 @@ public class LoanServiceTests {
     @Autowired
     private LoanService loanService;
 
-    private Loan new_loan = new Loan("Nehemiah Kamolu", "0734125591", "NIN12347UG", 200000, "month", 2, 0);
+    List<Lender> lender = new ArrayList<>();
+    private Loan new_loan = new Loan("Nehemiah Kamolu", "0734125591", "NIN12347UG", 200000, "month", 2, 0,new Date(),"active",2);
 
     @Test
     @DisplayName("Should get all Loans")

@@ -1,6 +1,7 @@
 package com.Dimes;
 
 import com.Dimes.Controllers.LoanController;
+import com.Dimes.Models.Lender;
 import com.Dimes.Models.Loan;
 import com.Dimes.Services.LoanService;
 import org.junit.jupiter.api.DisplayName;
@@ -18,7 +19,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 
-
+import java.util.ArrayList;
 import java.util.Arrays;
 
 
@@ -28,6 +29,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
+import java.util.Date;
 import java.util.List;
 
 @SpringBootTest
@@ -41,8 +43,8 @@ public class LoanControllerTest extends  JsonManager {
 
     @Autowired
     private MockMvc mockMvc;
-
-    private Loan loan = new Loan("Nehemiah Kamolu", "0734125591", "NIN12347UG", 200000, "month", 2, 0);
+   List<Lender> lenders = new ArrayList<>();
+    private Loan loan = new Loan("Nehemiah Kamolu", "0734125591", "NIN12347UG", 200000, "month", 2, 0,new Date(),"active",2);
 
 
     @Test
@@ -80,8 +82,8 @@ public class LoanControllerTest extends  JsonManager {
     void getLoansTest() throws Exception
     {
         List<Loan> loanList = Arrays.asList(
-                new Loan("Nehemiah Kamolu", "0734125591", "NIN12347UG", 200000, "month", 2, 0),
-               new Loan("Nehemiah John", "0734145591", "NIN12347UG", 200000, "month", 2, 0)
+                new Loan("Nehemiah Kamolu", "0734125591", "NIN12347UG", 200000, "month", 2, 0,new Date(),"active",2),
+               new Loan("Nehemiah John", "0734145591", "NIN12347UG", 200000, "month", 2, 0,new Date(),"active",2)
         );
 
         when(loanService.getAllLoans()).thenReturn(loanList);

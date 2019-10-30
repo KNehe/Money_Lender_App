@@ -27,7 +27,8 @@ public class Lender {
     public Lender() {
     }
 
-    public Lender(String companyName, double initialCapital, double interestRate, String email, String username, String password, String role) {
+    public Lender(int id,String companyName, double initialCapital, double interestRate, String email, String username, String password, String role) {
+        this.id = id;
         this.companyName = companyName;
         this.initialCapital = initialCapital;
         this.interestRate = interestRate;
