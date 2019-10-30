@@ -49,7 +49,7 @@ public class AuthControllerTests extends JsonManager {
     void saveLenderTest() throws  Exception
     {
         when(authService.RegisterLender(any(Lender.class))).thenReturn(true);
-
+        when(authService.isEmailValid("nehe@gmail.com")).thenReturn(true);
         MvcResult result = mockMvc.perform(post("/api/register")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(super.mapToJson(lender)))
