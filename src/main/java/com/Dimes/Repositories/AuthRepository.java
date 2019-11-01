@@ -21,8 +21,4 @@ public interface AuthRepository extends JpaRepository<Lender,Integer> {
     @Query(value = "SELECT id FROM register WHERE username=?1",nativeQuery = true)
     Optional<Integer> findUserId(String username);
 
-    //get user first name by username
-    @Query(value = "SELECT first_name FROM register WHERE username=?1",nativeQuery = true)
-    Optional<String> findFirstName(String username);
-
 }

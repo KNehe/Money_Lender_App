@@ -54,11 +54,6 @@ public class AuthService {
         return authRepository.findUserId(username);
     }
 
-    //get user first name by username
-    public String getUserFirstName(String username)
-    {
-        return authRepository.findFirstName(username).orElse("First name for "+ username + " not found");
-    }
 
     public List<Lender> getAllLenderDetails()
     {

@@ -4,25 +4,25 @@ import java.util.Optional;
 
 public class LoginViewModel  {
 
-    private String firstname;
+    private String username;
     private Optional<Integer> id;
     private String role;
 
     public LoginViewModel() {
     }
 
-    public LoginViewModel(String firstname, Optional<Integer> id, String role) {
-        this.firstname = firstname;
+    public LoginViewModel(String username, Optional<Integer> id, String role) {
+        this.username = username;
         this.id = id;
         this.role = role;
     }
 
-    public String getFirstname() {
-        return firstname;
+    public String getUsername() {
+        return username;
     }
 
-    public void setFirstname(String firstname) {
-        this.firstname = firstname;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public Optional<Integer> getId() {

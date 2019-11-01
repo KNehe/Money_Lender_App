@@ -109,16 +109,12 @@ public class AuthController {
     {
         if(request.isUserInRole("Admin"))
         {
-            return new LoginViewModel(authService.getUserFirstName(principal.getName()),
-                                      authService.getUserId(principal.getName()),
-                                     "Admin");
+            return new LoginViewModel(principal.getName(),authService.getUserId(principal.getName()),"Admin");
         }
 
         //Future use
         // If app register user of with ROLE_User
-        return new LoginViewModel(authService.getUserFirstName(principal.getName()),
-                authService.getUserId(principal.getName()),
-                "User");
+        return new LoginViewModel(principal.getName(),authService.getUserId(principal.getName()),"User");
     }
 
     @GetMapping("/getAllLenderDetails")
