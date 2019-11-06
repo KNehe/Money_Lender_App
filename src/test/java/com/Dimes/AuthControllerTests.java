@@ -6,6 +6,8 @@ import com.Dimes.Models.JwtRequest;
 import com.Dimes.Models.Lender;
 import com.Dimes.Models.LoginViewModel;
 import com.Dimes.Services.AuthService;
+import org.junit.Before;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import javax.print.attribute.standard.Media;
+import java.util.Arrays;
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -27,7 +31,7 @@ import static org.assertj.core.api.InstanceOfAssertFactories.type;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -45,6 +49,28 @@ public class AuthControllerTests extends JsonManager {
 
     private Lender lender = new Lender(1,"charles company",1000.0,2.3,"nehe@gmail.com","Nehe","12345678","Admin");
 
+    @Before
+     HttpHeaders getAuthHeader() throws  Exception
+    {
+        JwtRequest jwtRequest = new JwtRequest("charles","1234Pass");
+
+        MvcResult mvcResult = mockMvc.perform(post("/api/authenticate")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(super.mapToJson(jwtRequest)))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String result = mvcResult.getResponse().getContentAsString();
+
+        Token token = super.mapFromJson(result,Token.class);
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.set("Authorization","Bearer "+token.getToken());
+
+        return  httpHeaders;
+
+    }
+
     @Test
     void saveLenderTest() throws  Exception
     {
@@ -57,6 +83,8 @@ public class AuthControllerTests extends JsonManager {
                 .andReturn();
 
         assertThat(result.getResponse().getContentAsString().replaceAll("\"","")).isEqualTo("Registered successfully");
+
+        verify(authService,times(1)).isEmailValid("nehe@gmail.com");
     }
 
     @Test
@@ -64,6 +92,7 @@ public class AuthControllerTests extends JsonManager {
     void saveLenderTest2() throws  Exception
     {
         when(authService.RegisterLender(any(Lender.class))).thenReturn(false);
+        when(authService.isEmailValid("nehe@gmail.com")).thenReturn(true);
 
         MvcResult result = mockMvc.perform(post("/api/register")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -72,6 +101,8 @@ public class AuthControllerTests extends JsonManager {
                 .andReturn();
 
         assertThat(result.getResponse().getContentAsString().replaceAll("\"","")).isEqualTo("An error occurred while registering");
+
+        verify(authService,times(1)).RegisterLender(any(Lender.class));
     }
 
     @Test
@@ -79,6 +110,8 @@ public class AuthControllerTests extends JsonManager {
     void saveLenderTest3() throws  Exception
     {
         when(authService.checkIfLenderExists(lender.getUsername())).thenReturn(true);
+        when(authService.isEmailValid("nehe@gmail.com")).thenReturn(true);
+
 
         MvcResult result = mockMvc.perform(post("/api/register")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -86,6 +119,9 @@ public class AuthControllerTests extends JsonManager {
                 .andExpect(status().isConflict())
                 .andReturn();
         assertThat(result.getResponse().getContentAsString().replaceAll("\"","")).isEqualTo("Username Exists");
+
+        verify(authService,times(1)).checkIfLenderExists(anyString());
+
     }
 
     @Test
@@ -101,6 +137,8 @@ public class AuthControllerTests extends JsonManager {
                 .andReturn();
 
         assertThat(result.getResponse().getContentAsString().replaceAll("\"","")).isEqualTo("Invalid email");
+
+        verify(authService,times(1)).isEmailValid(anyString());
     }
 
     @Test
@@ -116,7 +154,7 @@ public class AuthControllerTests extends JsonManager {
 
         String result = mvcResult.getResponse().getContentAsString();
         Token token = super.mapFromJson(result,Token.class);
-        //System.out.println("TOKEN IS: "+ token.getToken() );
+       // System.out.println("TOKEN IS: "+ token.getToken() );
 
         assertThat(token.getToken()).isNotBlank();
 
@@ -138,34 +176,23 @@ public class AuthControllerTests extends JsonManager {
     void getUserIdDetailsTest() throws Exception
     {
         MvcResult mvcResult = mockMvc.perform(get("/api/getUserIdDetails")
-                .headers(new Token().getHttpHeaders()))
+                .headers(getAuthHeader()))
                 .andExpect(status().isOk())
                 .andReturn();
 
         assertEquals(mvcResult.getResponse().getContentType(),"application/json");
+
+
     }
 
-   /* @Test
-    void getUserIdDetailsFailTest() throws Exception
-    {
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.add("Authorization","Bearer "+new Token().testWrongToken);
 
-        MvcResult mvcResult = mockMvc.perform(get("/api/getUserIdDetails")
-                .headers(httpHeaders))
-                .andExpect(status().isOk())
-                .andReturn();
-
-        assertEquals(mvcResult.getResponse().getContentType(),"application/json");
-    }
-*/
    @Test
    void getAllLenderDetails() throws  Exception
    {
        when(authService.getAllLenderDetails()).thenReturn(Collections.singletonList(new Lender()));
 
        mockMvc.perform(get("/api/getAllLenderDetails")
-               .headers(new Token().getHttpHeaders()))
+               .headers(getAuthHeader()))
                .andExpect(status().isOk());
 
    }
@@ -174,24 +201,3 @@ public class AuthControllerTests extends JsonManager {
 
 }//test class
 
-class Token{
-
-    private String token;
-
-    String testRightToken = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjaGFybGVzIiwiZXhwIjoxNTcyMjc0ODc2LCJpYXQiOjE1NzIyNTY4NzZ9.OYsmXBDfrISBwwcfbvSyphXM5KRggdeKBR_ajF0AT5VGj13SueB-T1ycWZaPjhJyz-4wntfro-BwGHYgDBT09w";
-    String testWrongToken = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0b20iLCJleHAiOjE1NzIxMTcxNzQsImlhdCI6MTU3MjA5OTE3NH0.H1zP6iGhAmWPfx22z2I8XV_NAV_BIAYR9GuTDxGTbUwApiscJle8vz7t5so6ZnZfETwyRByEDgyz8apdHZOS_A";
-
-    public String getToken() {
-        return token;
-    }
-
-    public HttpHeaders getHttpHeaders()
-    {
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.add("Authorization","Bearer "+testRightToken);
-        return httpHeaders;
-    }
-
-
-
-}
